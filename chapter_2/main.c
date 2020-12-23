@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<fcntl.h>
 #include<errno.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 int fib(int n) {
     if (n == 0) {
@@ -49,10 +51,60 @@ int square_add(int a, int b) {
     return a2 + b2;
 }
 
+//process memory distribution
+// https://linuxhint.com/using_mmap_function_linux/
+void mmap_example1(){
+    int N = 1024*1024; // Number of elements for the array
+    int *ptr = mmap ( NULL, N*sizeof(int),
+                      PROT_READ | PROT_WRITE,
+                      MAP_PRIVATE | MAP_ANONYMOUS,
+                      0, 0 );
+    if(ptr == MAP_FAILED){
+        printf("Mapping Failed\n");
+    }
+
+
+    sleep(10*60);
+
+    // Fill the elements of the array
+    for(int i=0; i<N; i++){
+        ptr[i] = 1;
+    }
+
+    for(int i=0; i<N; i++){
+        printf("[%d] ",ptr[i]);
+    }
+
+    printf("\n");
+    int err = munmap(ptr, 10*sizeof(int));
+
+    if(err != 0) {
+        printf("UnMapping Failed\n");
+    }
+
+}
+
+void mmap_example2(){
+    int N = 1024*1024; // Number of elements for the array
+    int *ptr = mmap ( NULL, N*sizeof(int),
+                      PROT_NONE,
+                      MAP_PRIVATE | MAP_ANONYMOUS,
+                      0, 0 );
+    if(ptr == MAP_FAILED){
+        printf("Mapping Failed\n");
+    }
+    //Will error if write to it?
+
+    for(int i=0; i<N; i++){
+        ptr[i] = 1;
+    }
+
+    sleep(10*60);
+
+}
+
 
 int main() {
-    //int r = fib(10)
-    int r = square_add(3, 4);
-    printf("%d\n", r);
+    mmap_example2();
     return 0;
 }

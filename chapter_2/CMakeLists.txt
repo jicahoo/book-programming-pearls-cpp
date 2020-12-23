@@ -8,4 +8,4 @@ message("boost libs: ${Boost_LIBRARIES}")
 
 set(CMAKE_CXX_STANDARD 98)
 
-add_executable(hello_world main.cpp)
+add_executable(hello_world main.c)
